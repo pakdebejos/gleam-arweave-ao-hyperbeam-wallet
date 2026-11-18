@@ -10,6 +10,15 @@ describe("validatePassword", () => {
     }
   });
 
+  it("counts characters, not UTF-16 code units, for the minimum length", () => {
+    // Six emoji are six characters but twelve UTF-16 code units.
+    const result = validatePassword("\u{1F600}".repeat(6));
+    expect(result.valid).toBe(false);
+    if (!result.valid) {
+      expect(result.reason).toMatch(/at least 12 characters/i);
+    }
+  });
+
   it("rejects a common/breached password even if long enough", () => {
     const result = validatePassword("loginpassword");
     expect(result.valid).toBe(false);
