@@ -19,7 +19,10 @@ export type PasswordValidationResult =
  * never be blocked by a policy that only applies at password-set time.
  */
 export function validatePassword(password: string): PasswordValidationResult {
-  if (password.length < MIN_LENGTH) {
+  // Count characters, not UTF-16 code units: an astral character such as
+  // an emoji is one character but two code units, so `password.length`
+  // would let six of them pass a twelve-character minimum.
+  if ([...password].length < MIN_LENGTH) {
     return {
       valid: false,
       reason: userErrorMessage("passwordTooShort", { min: MIN_LENGTH }),
